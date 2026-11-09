@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="mk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LexPilot — Пазарно истражување</title>
+<meta name="description" content="Run Your Law Practice. Not Just Your Legal Research. Пазарно истражување за Северна Македонија." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&subset=cyrillic&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#05070F;--bg2:#02040A;--s1:#10172A;--s2:#080B15;
+  --line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.15);
+  --text:#F6F4EA;--dim:#B9BDCA;--mut:#7F879A;
+  --gold:#D6B45F;--gold2:#E7D7A1;--cyan:#61E6D8;--violet:#8EA4FF;--rose:#FF6F84;
+  --display:'Manrope',system-ui,sans-serif;--sans:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(ellipse 66% 54% at 50% -12%,rgba(85,103,168,.24),transparent 66%),radial-gradient(ellipse 54% 42% at 78% 106%,rgba(97,230,216,.08),transparent 68%),linear-gradient(180deg,#071024 0%,var(--bg) 46%,var(--bg2) 100%);background-attachment:fixed;color:var(--text);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:92px 104px 96px}
+.slide.active{display:flex}
+.center{align-items:center;text-align:center}
+
+/* Motion */
+@keyframes rise{from{transform:translate3d(0,24px,0)}to{transform:none}}
+.slide.active>*{animation:rise .8s cubic-bezier(.2,.7,.2,1) backwards}
+.slide.active>*:nth-child(2){animation-delay:.08s}.slide.active>*:nth-child(3){animation-delay:.16s}.slide.active>*:nth-child(4){animation-delay:.24s}.slide.active>*:nth-child(5){animation-delay:.32s}
+@media (prefers-reduced-motion:reduce){.slide.active>*{animation:none}}
+
+/* Type */
+.eyebrow{display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);font-size:14px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);margin-bottom:22px}
+.eyebrow:before{content:"";width:6px;height:6px;border-radius:9px;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+h1,h2,h3{font-family:var(--display);margin:0}
+h1{font-weight:800;font-size:150px;letter-spacing:-.05em;line-height:1}
+h2{font-weight:700;font-size:54px;letter-spacing:-.035em;line-height:1.1;max-width:1320px;text-wrap:balance}
+h2 em{font-style:normal;color:var(--gold2)}
+h3{font-weight:700;font-size:25px;letter-spacing:-.02em}
+p{margin:0}
+.lead{font-size:23px;line-height:1.45;color:var(--dim);max-width:1120px;margin-top:18px}
+.mono{font-family:var(--mono);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+.src{position:absolute;left:104px;right:104px;bottom:76px;font-family:var(--mono);font-size:12px;letter-spacing:.03em;color:var(--mut)}
+.gold{color:var(--gold2)}.cyan{color:var(--cyan)}.violet{color:var(--violet)}.rose{color:var(--rose)}
+.climax{background:linear-gradient(104deg,#fff 6%,var(--gold2) 44%,var(--cyan) 92%);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* Surfaces */
+.panel{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.008)),linear-gradient(180deg,var(--s1),var(--s2));border:1px solid var(--line);border-radius:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 30px 64px -34px rgba(0,0,0,.9)}
+.grid{display:grid;gap:20px;margin-top:38px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+.card{padding:28px}
+.card p{color:var(--dim);font-size:18px;line-height:1.42;margin-top:10px}
+.num{font-family:var(--display);font-weight:800;font-size:76px;letter-spacing:-.045em;line-height:1;font-variant-numeric:tabular-nums}
+.note{margin-top:28px;padding:20px 26px;border-left:2px solid var(--gold);background:rgba(214,180,95,.06);border-radius:0 12px 12px 0;font-size:21px;line-height:1.4;max-width:1280px}
+
+/* Tables */
+.tw{margin-top:30px;overflow:hidden}
+table{border-collapse:collapse;width:100%;font-size:18px}
+th{font-family:var(--mono);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:500;text-align:right;padding:15px 16px;border-bottom:1px solid var(--line2)}
+td{padding:14px 16px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;color:var(--dim)}
+th:first-child,td:first-child{text-align:left;color:var(--text)}
+tr:last-child td{border-bottom:0}
+tr.total td{color:var(--text);font-weight:700;background:rgba(214,180,95,.07)}
+.left th,.left td{text-align:left}
+.mid th:not(:first-child),.mid td:not(:first-child){text-align:center}
+.lp{background:rgba(214,180,95,.08)}
+.y{color:var(--cyan);font-weight:700}.n{color:var(--rose);font-weight:700}.u{color:var(--mut)}.p{color:var(--gold2);font-weight:600}
+
+/* Funnel */
+.somg{display:grid;grid-template-columns:1fr 410px;gap:56px;margin-top:30px;align-items:end}
+.tam{display:grid;grid-template-columns:500px 1fr;gap:64px;align-items:center;margin-top:24px}
+.rowm{display:grid;grid-template-columns:110px 1fr auto;gap:22px;align-items:center;padding:22px 0;border-bottom:1px solid var(--line)}
+.rowm:last-child{border:0}
+.rowm b{font-family:var(--display);font-weight:800;font-size:34px}
+.rowm .q{font-size:19px;color:var(--dim)}.rowm .q small{display:block;margin-top:4px;color:var(--mut);font-size:15px}
+.rowm .v{font-family:var(--display);font-weight:800;font-size:54px;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+
+/* Bars */
+.bars{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;height:400px}
+.grp{display:flex;flex-direction:column}
+.cols{flex:1;display:flex;align-items:flex-end;gap:14px;border-bottom:1px solid var(--line2)}
+.col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center}
+.col i{display:block;border-radius:7px 7px 0 0;background:rgba(142,164,255,.3)}
+.col.base i{background:linear-gradient(180deg,var(--gold2),var(--gold))}
+.col span{font-size:17px;font-weight:600;color:var(--dim);margin-bottom:7px;font-variant-numeric:tabular-nums}
+.col.base span{color:var(--gold2)}
+.grp>.mono{text-align:center;margin-top:12px}
+.leg{display:flex;gap:24px;margin-top:16px;font-size:15px;color:var(--dim)}
+.leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;background:rgba(142,164,255,.3)}
+.leg .b i{background:var(--gold)}
+.hb{display:grid;grid-template-columns:120px 1fr 104px;gap:14px;align-items:center;font-size:18px;margin-top:11px;color:var(--dim)}
+.hb .t{height:18px}.hb .t i{display:block;height:100%;border-radius:0 6px 6px 0;background:rgba(142,164,255,.34)}
+.hb.lpb,.hb.lpb b{color:var(--gold2)}.hb.lpb .t i{background:var(--gold)}
+.hb b{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+
+/* Competitors */
+.comp{padding:24px}
+.comp .price{font-family:var(--mono);font-size:14px;color:var(--gold2);margin-top:8px;min-height:38px;line-height:1.35}
+.comp ul{list-style:none;margin:14px 0 0;padding:0}
+.comp li{position:relative;font-size:16.5px;line-height:1.34;color:var(--dim);padding-left:21px;margin-top:10px}
+.comp li:before{position:absolute;left:0;font-weight:700}
+.comp .pro li:before{content:"+";color:var(--cyan)}.comp .con li:before{content:"–";color:var(--rose)}
+.comp .con{border-top:1px solid var(--line);margin-top:14px;padding-top:4px}
+
+/* Chips */
+.chips{display:flex;gap:16px;margin-top:44px;flex-wrap:wrap}
+.chip{padding:22px 30px;font-family:var(--display);font-weight:700;font-size:26px}
+.chip small{display:block;font-family:var(--sans);font-weight:400;font-size:16px;color:var(--mut);margin-top:5px}
+
+/* Logo */
+.logo{width:112px;height:112px;border-radius:24px;display:grid;place-items:center;background:#061126;border:1px solid rgba(231,215,161,.3);box-shadow:0 0 110px -18px rgba(214,180,95,.65),inset 0 1px 0 rgba(255,255,255,.12);margin-bottom:38px}
+
+/* Chrome */
+.brand{position:absolute;top:32px;left:44px;display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:700;font-size:15px;color:rgba(255,255,255,.66);z-index:5}
+.count{position:absolute;top:34px;right:44px;font-family:var(--mono);font-size:13px;letter-spacing:.2em;color:var(--mut);z-index:5}
+.count b{color:rgba(255,255,255,.7);font-weight:500}
+.foot{position:absolute;left:44px;right:44px;bottom:26px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+.btns{display:flex;gap:10px}
+button{width:42px;height:42px;border-radius:50%;color:#fff;font-size:18px;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.03));border:1px solid var(--line2)}
+button:hover{border-color:rgba(214,180,95,.55)}
+button:disabled{opacity:.3;cursor:default}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.bar{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.05);z-index:5}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--cyan));transition:width .6s cubic-bezier(.2,.7,.2,1)}
+
+/* Phone: slides stack and scroll */
+@media (max-width:700px){
+  body{overflow:auto}
+  #stage{position:static;width:auto;height:auto;transform:none!important}
+  .slide{position:static;display:flex;padding:56px 16px;min-height:auto;border-bottom:1px solid var(--line)}
+  .brand,.count,.foot,.bar{display:none}
+  .src{position:static;margin-top:18px}
+  h1{font-size:64px!important}h2{font-size:32px!important}.lead{font-size:18px}.num{font-size:54px}
+  .g2,.g3,.g4,.g5,.tam,.bars,.somg{grid-template-columns:minmax(0,1fr)}
+  .hint{display:none}
+  .bars{height:auto}.grp{height:230px}
+  .tam svg{max-width:300px;margin:0 auto}
+  .rowm{grid-template-columns:62px 1fr}.rowm .v{grid-column:2;font-size:38px}.rowm b{font-size:24px}
+  .tw{overflow-x:auto}table{min-width:680px;font-size:15px}
+  .hb{grid-template-columns:96px 1fr 62px;font-size:15px}
+}
+@media print{
+  @page{size:1600px 900px;margin:0}
+  body{overflow:visible;background:#05070F;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #stage{position:static;transform:none!important;height:auto}
+  .slide{position:relative;display:flex;width:1600px;height:900px;break-after:page}
+  .brand,.count,.foot,.bar{display:none}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="brand"><svg width="24" height="24" viewBox="0 0 48 48" fill="none" stroke="#E7D7A1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 7v34M14 41h20M10 13h28M10 13 4 28h12zM38 13l-6 15h12z"/></svg>LexPilot</div>
+  <div class="count" aria-live="polite"><b id="cur">01</b> / <span id="tot">14</span></div>
+
+  <!-- 01 — ИМЕ -->
+  <section class="slide center" data-label="01 — Наслов">
+    <div class="logo"><svg width="64" height="64" viewBox="0 0 48 48" fill="none" stroke="#E7D7A1" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 7v34M14 41h20M10 13h28M10 13 4 28h12zM38 13l-6 15h12z"/></svg></div>
+    <div class="eyebrow">Пазарно истражување · Северна Македонија · 2026</div>
+    <h1>LexPilot</h1>
+    <p class="lead" style="font-family:var(--display);font-weight:600;font-size:34px;margin-top:24px;color:var(--text)">Run Your Law Practice. <span style="color:var(--dim)">Not Just Your Legal Research.</span></p>
+    <p class="mono hint" style="margin-top:44px">Притисни → за почеток</p>
+  </section>
+
+  <!-- 02 — ПРОБЛЕМ -->
+  <section class="slide" data-label="02 — Проблем">
+    <div class="eyebrow">Проблем</div>
+    <h2>Адвокатот води предмети. <em>А канцеларијата е расфрлана.</em></h2>
+    <div class="chips">
+      <div class="panel chip">Тетратка<small>рочишта и рокови</small></div>
+      <div class="panel chip">Excel<small>листа на предмети</small></div>
+      <div class="panel chip">Папки<small>договори и докази</small></div>
+      <div class="panel chip">Е-пошта<small>кореспонденција</small></div>
+      <div class="panel chip">Viber<small>клиенти и договори</small></div>
+    </div>
+    <div class="note">Кога нема еден преглед, еден пропуштен рок може да го чини клиентот предметот, а адвокатот угледот.</div>
+    <div class="src">Хипотеза за потврдување со интервјуа со адвокати.</div>
+  </section>
+
+  <!-- 03 — РЕШЕНИЕ -->
+  <section class="slide" data-label="03 — Решение">
+    <div class="eyebrow">Решение · MVP</div>
+    <h2>Цела канцеларија, <em>на едно место.</em></h2>
+    <div class="grid g4">
+      <div class="panel card"><h3>Клиенти</h3><p>Профил, контакти, белешки и сите предмети на клиентот.</p></div>
+      <div class="panel card"><h3>Предмети</h3><p>Тип, суд, статус, одговорен адвокат и целосна историја.</p></div>
+      <div class="panel card"><h3>Документи</h3><p>Прикачување, категории и пребарување по клиент и предмет.</p></div>
+      <div class="panel card"><h3>Календар и рокови</h3><p>Рочишта, состаноци, правни рокови и потсетници.</p></div>
+    </div>
+    <div class="note"><b class="gold">Правило на производот:</b> адвокатот го внесува или потврдува секој правен рок. Системот не погодува рокови со AI.</div>
+    <div class="src">Безбедност од почеток: шифрирање при пренос, улоги, одвоени податоци по канцеларија, резервни копии, дневник на активности.</div>
+  </section>
+
+  <!-- 04 — ПАЗАР -->
+  <section class="slide" data-label="04 — Пазар">
+    <div class="eyebrow">Пазар</div>
+    <h2>Мала, густа и <em>лесно достапна</em> професија.</h2>
+    <div class="grid g3">
+      <div class="panel card"><div class="num gold">2.877</div><p>адвокати во Северна Македонија (2024). Една комора, еден именик.</p></div>
+      <div class="panel card"><div class="num">157,5</div><p>адвокати на 100.000 жители. Просекот во Западен Балкан е 137,5.</p></div>
+      <div class="panel card"><div class="num cyan">≈2.043</div><p>канцеларии според нашата проценка. Околу 5 од 6 се соло адвокати.</p></div>
+    </div>
+    <div class="note">Една комора значи еден канал до целиот пазар. Но и дека лошиот глас брзо се шири.</div>
+    <div class="src">Извор: CEPEJ Western Balkans Dashboard, податоци за 2024. Бројот на канцеларии е проценка (види xlsx).</div>
+  </section>
+
+  <!-- 05 — TAM SAM SOM -->
+  <section class="slide" data-label="05 — TAM SAM SOM">
+    <div class="eyebrow">Големина на пазарот · годишен приход</div>
+    <h2>Вистински пазар. <em>Мал, но вистински.</em></h2>
+    <div class="tam">
+      <svg viewBox="0 0 460 460" role="img" aria-label="TAM 452.520 евра, SAM 220.740 евра, SOM 29.280 евра, плоштините се пропорционални">
+        <circle cx="230" cy="230" r="220" fill="rgba(142,164,255,.1)" stroke="rgba(142,164,255,.5)"/>
+        <circle cx="230" cy="296.3" r="153.7" fill="rgba(97,230,216,.1)" stroke="rgba(97,230,216,.55)"/>
+        <circle cx="230" cy="394" r="56" fill="rgba(214,180,95,.9)"/>
+        <g font-family="Manrope,sans-serif" font-weight="800" text-anchor="middle">
+          <text x="230" y="76" font-size="30" fill="#B8C4FF">TAM</text>
+          <text x="230" y="222" font-size="30" fill="#61E6D8">SAM</text>
+          <text x="230" y="404" font-size="30" fill="#090A10">SOM</text>
+        </g>
+      </svg>
+      <div>
+        <div class="rowm"><b class="violet">TAM</b><div class="q">Вкупна можност<small>Сите 2.043 канцеларии</small></div><div class="v">€452.520</div></div>
+        <div class="rowm"><b class="cyan">SAM</b><div class="q">Што може да опслужи MVP<small>1.000 активни, дигитално подготвени канцеларии</small></div><div class="v">€220.740</div></div>
+        <div class="rowm"><b class="gold">SOM</b><div class="q">Што реално освојуваме<small>126 канцеларии до Година 3 · 13% од SAM</small></div><div class="v gold">€29.280</div></div>
+      </div>
+    </div>
+    <div class="src">ARR во EUR, без ДДВ. Деталите и формулите се во LexPilot-market-research.xlsx.</div>
+  </section>
+
+  <!-- 06 — ПРЕСМЕТКА -->
+  <section class="slide" data-label="06 — Пресметка">
+    <div class="eyebrow">Како стигнавме до бројките</div>
+    <h2>Од сите канцеларии до <em>126 плаќачи.</em></h2>
+    <div class="panel tw">
+      <table>
+        <thead><tr><th>Сегмент</th><th>Канцеларии</th><th>Цена/год.</th><th>TAM</th><th>SAM филтер</th><th>SAM канц.</th><th>SAM</th><th>Удел Год. 3</th><th>SOM канц.</th><th>SOM</th></tr></thead>
+        <tbody>
+          <tr><td>Соло (1)</td><td>1.726</td><td>€180</td><td>€310.680</td><td>48,6%</td><td>839</td><td>€151.020</td><td>12%</td><td>101</td><td>€18.180</td></tr>
+          <tr><td>Мала (2–5)</td><td>288</td><td>€420</td><td>€120.960</td><td>53,4%</td><td>154</td><td>€64.680</td><td>15%</td><td>23</td><td>€9.660</td></tr>
+          <tr><td>Поголема (6+)</td><td>29</td><td>€720</td><td>€20.880</td><td>24,5%</td><td>7</td><td>€5.040</td><td>28%</td><td>2</td><td>€1.440</td></tr>
+          <tr class="total"><td>Вкупно</td><td>2.043</td><td></td><td>€452.520</td><td></td><td>1.000</td><td>€220.740</td><td></td><td>126</td><td>€29.280</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><b class="gold">SAM филтер</b> = активна канцеларија × подготвена за облак × MVP е доволен без фактури. Овие проценки ги проверуваме со интервјуа.</div>
+    <div class="src">Основа: 2.877 адвокати (CEPEJ). Удели 60/30/10 и пенетрацијата се проценки. Цените се предлог за тестирање.</div>
+  </section>
+
+  <!-- 07 — SOM -->
+  <section class="slide" data-label="07 — SOM сценарија">
+    <div class="eyebrow">SOM · три години</div>
+    <h2>Македонија е <em>доказ на концепт</em>, не крајна цел.</h2>
+    <div class="somg">
+      <div>
+        <div class="bars">
+          <div class="grp"><div class="cols">
+            <div class="col"><span>€3,2k</span><i style="height:5.6%"></i></div><div class="col base"><span>€6,6k</span><i style="height:11.6%"></i></div><div class="col"><span>€12,1k</span><i style="height:21.1%"></i></div>
+          </div><div class="mono">Година 1</div></div>
+          <div class="grp"><div class="cols">
+            <div class="col"><span>€7,7k</span><i style="height:13.5%"></i></div><div class="col base"><span>€16,4k</span><i style="height:28.7%"></i></div><div class="col"><span>€29,3k</span><i style="height:51.2%"></i></div>
+          </div><div class="mono">Година 2</div></div>
+          <div class="grp"><div class="cols">
+            <div class="col"><span>€14,8k</span><i style="height:25.8%"></i></div><div class="col base"><span>€29,3k</span><i style="height:51.2%"></i></div><div class="col"><span>€48,8k</span><i style="height:85.4%"></i></div>
+          </div><div class="mono">Година 3</div></div>
+        </div>
+        <div class="leg"><span>Лево: конзервативно · Средина: основно <i style="background:var(--gold);margin-left:8px"></i> · Десно: оптимистично</span></div>
+      </div>
+      <div class="panel card">
+        <div class="num gold" style="font-size:62px">≈2,1</div>
+        <p>просечни бруто годишни плати покрива основниот SOM во Година 3.</p>
+        <p style="color:var(--text);margin-top:20px">Доволно за мал профитабилен производ. За поголем бизнис е потребен регион или дополнителни модули.</p>
+      </div>
+    </div>
+    <div class="src">Кумулативен ARR, без одлив на клиенти. Просечна бруто плата: 72.818 MKD месечно (март 2026).</div>
+  </section>
+
+  <!-- 08 — КОНКУРЕНТИ -->
+  <section class="slide" data-label="08 — Конкуренти" style="padding-top:78px">
+    <div class="eyebrow" style="margin-bottom:14px">Конкуренти</div>
+    <h2 style="font-size:46px">Пазарот не е празен. <em>Четири веќе го покриваат MVP.</em></h2>
+    <div class="grid g4" style="margin-top:24px">
+      <div class="panel comp"><h3>ClerkMind</h3><div class="price">Цена не е објавена</div>
+        <ul class="pro"><li>Рокови од судски документ, 15 типа постапки</li><li>Тарифа, фактури, AI со Службен весник</li><li>Детална безбедност, хостинг во ЕУ</li></ul>
+        <ul class="con"><li>Само преку барање и демо</li><li>Без автоматски увоз</li><li>Без објавени клиенти или тим</li></ul></div>
+      <div class="panel comp"><h3>Clarita</h3><div class="price">€17,99 – €99 месечно</div>
+        <ul class="pro"><li>Јавна цена, сите функции во секој план</li><li>Е-потпис, портал, конфликт на интереси</li><li>Увоз од Excel, шифрирање во прелистувач</li></ul>
+        <ul class="con"><li>Максимум 3 корисници</li><li>Нема македонска тарифа на страницата</li><li>Без именуван тим</li></ul></div>
+      <div class="panel comp"><h3>Justitia</h3><div class="price">16.000 MKD годишно<br>≈ €220 без ДДВ, неограничено</div>
+        <ul class="pro"><li>Најниска цена за тимови</li><li>Едноставни 7 модули со фактури и задачи</li><li>Работи на телефон и таблет</li></ul>
+        <ul class="con"><li>Нема наведени потсетници за рокови</li><li>Нема опис на безбедност</li><li>Пријавување преку формулар и рачно</li></ul></div>
+      <div class="panel comp"><h3>е-Адвокат</h3><div class="price">€180 – €720 годишно<br>+ 18% ДДВ</div>
+        <ul class="pro"><li>Судски и оставински постапки</li><li>Шаблони, трошковник, автоматски фактури</li><li>Вграден уредувач за Word</li></ul>
+        <ul class="con"><li>Лимит 20–100 предмети годишно</li><li>Клучни функции стојат „наскоро“</li><li>Нема AI, сајт со © 2020</li></ul></div>
+    </div>
+    <div class="src">Извор: јавни страници, ноември 2026. Производите не се тестирани одвнатре.</div>
+  </section>
+
+  <!-- 09 — МАТРИЦА -->
+  <section class="slide" data-label="09 — Матрица" style="padding-top:78px">
+    <div class="eyebrow" style="margin-bottom:14px">Функции</div>
+    <h2 style="font-size:46px">Со сегашниот обем, <em>MVP е зад сите.</em></h2>
+    <div class="panel tw mid" style="margin-top:22px">
+      <table style="font-size:17px">
+        <thead><tr><th>Функција</th><th>ClerkMind</th><th>Clarita</th><th>Justitia</th><th>е-Адвокат</th><th class="lp gold">LexPilot MVP</th></tr></thead>
+        <tbody>
+          <tr><td>4 основни модули</td><td class="y">Да</td><td class="y">Да</td><td class="y">Да</td><td class="y">Да</td><td class="lp y">Да</td></tr>
+          <tr><td>Автоматски потсетници</td><td class="y">Да</td><td class="y">Да</td><td class="u">Не е наведено</td><td class="u">Не е наведено</td><td class="lp y">Да</td></tr>
+          <tr><td>Македонски правила за рокови</td><td class="y">Да</td><td class="u">Не е наведено</td><td class="u">Не е наведено</td><td class="u">Не е наведено</td><td class="lp n">Не</td></tr>
+          <tr><td>Фактурирање</td><td class="y">Да</td><td class="y">Да</td><td class="y">Да</td><td class="y">Да</td><td class="lp n">Не</td></tr>
+          <tr><td>Шаблони за документи</td><td class="y">Да</td><td class="y">Да</td><td class="u">Не е наведено</td><td class="y">Да</td><td class="lp n">Не</td></tr>
+          <tr><td>AI асистент</td><td class="y">Да</td><td class="y">Да</td><td class="u">Не е наведено</td><td class="u">Не е наведено</td><td class="lp n">Не</td></tr>
+          <tr><td>Јавна цена</td><td class="n">Не</td><td class="y">Да</td><td class="y">Да</td><td class="y">Да</td><td class="lp p">Предлог</td></tr>
+          <tr><td>Увоз од Excel</td><td class="n">Не</td><td class="y">Да</td><td class="u">Не е наведено</td><td class="u">Не е наведено</td><td class="lp p">Предлог</td></tr>
+          <tr><td>Viber/SMS потсетници</td><td class="u">Не е наведено</td><td class="u">Не е наведено</td><td class="u">Не е наведено</td><td class="u">Не е наведено</td><td class="lp p">Предлог</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="src">„Не е наведено“: не го најдовме на јавната страница. Не значи дека сигурно не постои.</div>
+  </section>
+
+  <!-- 10 — ЦЕНА -->
+  <section class="slide" data-label="10 — Цена">
+    <div class="eyebrow">Цена за канцеларија годишно</div>
+    <h2>Цената <em>не е нашето оружје.</em></h2>
+    <div class="grid g3">
+      <div class="panel card"><h3>1 адвокат</h3>
+        <div class="hb lpb"><span>LexPilot</span><div class="t"><i style="width:75%"></i></div><b>€180</b></div>
+        <div class="hb"><span>е-Адвокат</span><div class="t"><i style="width:75%"></i></div><b>€180</b></div>
+        <div class="hb"><span>Clarita</span><div class="t"><i style="width:90%"></i></div><b>€216</b></div>
+        <div class="hb"><span>Justitia</span><div class="t"><i style="width:92%"></i></div><b>€220</b></div>
+      </div>
+      <div class="panel card"><h3>3 адвокати</h3>
+        <div class="hb"><span>Justitia</span><div class="t"><i style="width:18.5%"></i></div><b>€220</b></div>
+        <div class="hb lpb"><span>LexPilot</span><div class="t"><i style="width:35%"></i></div><b>€420</b></div>
+        <div class="hb"><span>е-Адвокат</span><div class="t"><i style="width:40%"></i></div><b>€480</b></div>
+        <div class="hb"><span>Clarita</span><div class="t"><i style="width:100%"></i></div><b>€1.188</b></div>
+      </div>
+      <div class="panel card"><h3>10 адвокати</h3>
+        <div class="hb"><span>Justitia</span><div class="t"><i style="width:30.5%"></i></div><b>€220</b></div>
+        <div class="hb lpb"><span>LexPilot</span><div class="t"><i style="width:100%"></i></div><b>€720</b></div>
+        <div class="hb"><span>е-Адвокат</span><div class="t"><i style="width:100%"></i></div><b>€720</b></div>
+        <div class="hb"><span>Clarita</span><div class="t"></div><b class="u">Нема план</b></div>
+      </div>
+    </div>
+    <div class="note">Justitia дава неограничено за околу €220. Затоа за тимови мора да продаваме <b class="gold">сигурност и заштедено време</b>, а не пониска цена.</div>
+    <div class="src">Сите цени без ДДВ. Цените на LexPilot се предлог. ClerkMind не објавува цена. Секоја картичка има своја скала.</div>
+  </section>
+
+  <!-- 11 — МОЖНОСТИ -->
+  <section class="slide" data-label="11 — Можности" style="padding-top:78px">
+    <div class="eyebrow" style="margin-bottom:14px">Каде можеме да бидеме подобри</div>
+    <h2 style="font-size:46px">Нивните слабости се <em>нашиот план.</em></h2>
+    <div class="panel tw left" style="margin-top:24px">
+      <table style="font-size:18px">
+        <thead><tr><th style="width:27%">Слабост</th><th style="width:27%">Кај кого</th><th>Одговор на LexPilot</th></tr></thead>
+        <tbody>
+          <tr><td>Роковите се пасивен запис</td><td>Justitia, е-Адвокат</td><td><b class="gold">Рок што мора да се потврди:</b> Viber/SMS, ескалација до замена, доказ дека е виден</td></tr>
+          <tr><td>Тежок почеток</td><td>ClerkMind рачно внесување</td><td><b class="gold">Преселба за 1 ден:</b> Excel увоз и ние ги внесуваме првите предмети</td></tr>
+          <tr><td>Нејасна цена или лимити</td><td>ClerkMind, е-Адвокат, Clarita</td><td><b class="gold">Јавна цена</b> и неограничени предмети во секој план</td></tr>
+          <tr><td>Слаба доверба</td><td>ClerkMind, Clarita, Justitia</td><td><b class="gold">Познат тим:</b> правно лице, ЕУ хостинг, договор за обработка, извоз во секое време</td></tr>
+          <tr><td>Застоени ветувања</td><td>е-Адвокат</td><td><b class="gold">Следен чекор:</b> судска е-пошта автоматски поврзана со предмет</td></tr>
+          <tr><td>Сложено за соло адвокат*</td><td>ClerkMind, Clarita</td><td><b class="gold">Четири модула,</b> поставување за 10 минути, „Денес во суд“ на телефон</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="src">* Хипотеза за потврдување. Останатото е засновано на јавните страници на конкурентите.</div>
+  </section>
+
+  <!-- 12 — ПОЗИЦИОНИРАЊЕ -->
+  <section class="slide" data-label="12 — Позиционирање">
+    <div class="eyebrow">Позиционирање</div>
+    <h2>„Не сме Factum“ не е доволно. <em>Треба едно ветување.</em></h2>
+    <div class="grid g2" style="align-items:stretch">
+      <div class="panel card" style="padding:38px">
+        <div class="mono">Предлог-ветување</div>
+        <p style="font-family:var(--display);font-weight:800;font-size:46px;letter-spacing:-.03em;line-height:1.12;color:var(--text);margin-top:18px">Канцеларија што <span class="climax">не пропушта рок.</span></p>
+        <p style="font-size:21px;margin-top:20px">Наједноставниот начин македонски адвокат да премине од хартија на целосен преглед за еден ден.</p>
+      </div>
+      <div class="panel tw left" style="margin-top:0">
+        <table style="font-size:18px">
+          <tbody>
+            <tr><td>Factum</td><td>Правно истражување. <b class="cyan">Партнер.</b></td></tr>
+            <tr><td>ClerkMind</td><td>Сè-во-едно со AI</td></tr>
+            <tr><td>Clarita</td><td>Општа напредна платформа</td></tr>
+            <tr><td>е-Адвокат</td><td>Богат, постар систем</td></tr>
+            <tr><td>Justitia</td><td>Најевтина рамна цена</td></tr>
+            <tr class="total"><td class="gold">LexPilot</td><td class="gold">Едноставно и сигурно</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="src">Позициите се наша проценка врз основа на јавните страници.</div>
+  </section>
+
+  <!-- 13 — ПЛАН -->
+  <section class="slide" data-label="13 — План">
+    <div class="eyebrow">Препорака</div>
+    <h2>Малку промени на MVP. <em>Прво докажи го пазарот.</em></h2>
+    <div class="grid g3">
+      <div class="panel card"><div class="mono gold">Додај во MVP</div><p style="color:var(--text)">Viber/SMS потсетници со потврда и ескалација.</p><p style="color:var(--text)">Excel увоз и помош при внес на првите предмети.</p></div>
+      <div class="panel card"><div class="mono gold">Веднаш по MVP</div><p style="color:var(--text)">Основно фактурирање. Сите четири конкуренти го имаат.</p><p style="color:var(--text)">Едноставни задачи по предмет.</p></div>
+      <div class="panel card"><div class="mono gold">8 недели валидација</div><p style="color:var(--text)">15–20 интервјуа, тест на цена и кликабилен прототип.</p><p style="color:var(--text)">10 пилот-канцеларии. Разговор со Комората и Factum.</p></div>
+    </div>
+    <div class="note"><b class="rose">Сменете го планот ако:</b> помалку од 5 од 20 адвокати го гледаат ова како сериозен проблем, или помалку од 3 од 10 пилот-канцеларии сакаат да платат.</div>
+  </section>
+
+  <!-- 14 — КРАЈ -->
+  <section class="slide center" data-label="14 — Крај">
+    <div class="eyebrow">LexPilot</div>
+    <h1 style="font-size:92px;max-width:1300px;line-height:1.06">Run Your Law Practice.<br><span class="climax">Not Just Your Legal Research.</span></h1>
+    <p class="lead" style="margin-top:34px">Едно место за клиенти, предмети, документи и рокови.</p>
+    <p class="mono" style="margin-top:44px">TAM €452.520 · SAM €220.740 · SOM €29.280</p>
+  </section>
+
+  <div class="foot">
+    <div class="mono" id="lbl" style="font-size:12px"></div>
+    <div class="btns"><button id="prev" aria-label="Претходен слајд">←</button><button id="next" aria-label="Следен слајд">→</button></div>
+  </div>
+  <div class="bar"><i id="fill"></i></div>
+</div>
+
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = [].slice.call(document.querySelectorAll('.slide'));
+  var cur = document.getElementById('cur'), lbl = document.getElementById('lbl'), fill = document.getElementById('fill');
+  var prev = document.getElementById('prev'), next = document.getElementById('next');
+  var i = 0;
+  document.getElementById('tot').textContent = String(slides.length).padStart(2, '0');
+
+  function go(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === i); });
+    cur.textContent = String(i + 1).padStart(2, '0');
+    lbl.textContent = slides[i].dataset.label;
+    fill.style.width = ((i + 1) / slides.length * 100) + '%';
+    prev.disabled = i === 0; next.disabled = i === slides.length - 1;
+    history.replaceState(null, '', '#' + (i + 1));
+  }
+  function fit() {
+    if (window.innerWidth <= 700) { stage.style.transform = ''; return; }
+    var s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+    var x = (window.innerWidth - 1600 * s) / 2, y = (window.innerHeight - 900 * s) / 2;
+    stage.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + s + ')';
+  }
+  prev.onclick = function () { go(i - 1); };
+  next.onclick = function () { go(i + 1); };
+  addEventListener('keydown', function (e) {
+    if (['ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1) { e.preventDefault(); go(i + 1); }
+    if (['ArrowLeft', 'PageUp'].indexOf(e.key) > -1) { e.preventDefault(); go(i - 1); }
+    if (e.key === 'Home') go(0);
+    if (e.key === 'End') go(slides.length - 1);
+  });
+  addEventListener('resize', fit);
+  fit();
+  go((parseInt(location.hash.slice(1), 10) || 1) - 1);
+})();
+</script>
+</body>
+</html>
